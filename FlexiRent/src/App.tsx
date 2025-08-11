@@ -13,6 +13,7 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Signup from './pages/Signup';
 import CustomerPortal from './pages/CustomerPortal';
+import AdminDashboard from './pages/AdminDashboard';
 
 const queryClient = new QueryClient();
 
@@ -41,12 +42,7 @@ const AppContent: React.FC = () => {
       case 'customer-portal':
         return <CustomerPortal />;
       case 'admin-dashboard':
-        return <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
-            <p className="text-muted-foreground">Coming soon...</p>
-          </div>
-        </div>;
+        return <AdminDashboard />;
       default:
         return <Login />;
     }
