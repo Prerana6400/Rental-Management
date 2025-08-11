@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import { toast } from '../hooks/use-toast';
+import apiService from '../services/api';
 
 const Signup: React.FC = () => {
   const { setUser, setCurrentPage } = useAppContext();
@@ -13,6 +15,7 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,18 +38,26 @@ const Signup: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    setError('');
+
     try {
-      // Mock signup: immediately create a user and log in
-      const newUser = {
-        id: Date.now().toString(),
+      // Real API signup
+      const response = await apiService.signup({
         name: name.trim(),
         email: email.trim(),
-        role: 'customer' as const,
-      };
+        password: password,
+        role: 'user' // Default role for new signups
+      });
 
-      setUser(newUser);
-      toast({ title: 'Account created', description: 'Welcome to FlexiRent!' });
-      setCurrentPage('marketplace');
+      if (response.success) {
+        setUser(response.data.user);
+        toast({ title: 'Account created', description: 'Welcome to FlexiRent!' });
+        setCurrentPage('marketplace');
+      } else {
+        setError(response.message || 'Signup failed');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Signup failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -131,6 +142,15 @@ const Signup: React.FC = () => {
                 {isSubmitting ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
+
+            {error && (
+              <Alert className="mt-4 border-red-200 bg-red-50">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  {error}
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{' '}

@@ -4,9 +4,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-// @desc    Get all users (Admin only)
-// @route   GET /api/users
-// @access  Private/Admin
+
 const getUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -69,9 +67,7 @@ const getUserById = async (req, res) => {
   }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
-// @access  Private
+
 const updateProfile = async (req, res) => {
   try {
     const { name, email, phone, address } = req.body;
@@ -131,17 +127,15 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// @desc    Update user role (Admin only)
-// @route   PUT /api/users/:id/role
-// @access  Private/Admin
+
 const updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
 
-    if (!['enduser', 'customer', 'admin'].includes(role)) {
+    if (!['user', 'admin'].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid role. Must be enduser, customer, or admin'
+        message: 'Invalid role. Must be user or admin'
       });
     }
 
@@ -177,9 +171,6 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-// @desc    Deactivate/Activate user (Admin only)
-// @route   PUT /api/users/:id/status
-// @access  Private/Admin
 const updateUserStatus = async (req, res) => {
   try {
     const { isActive } = req.body;
@@ -260,7 +251,7 @@ const getUsersByRole = async (req, res) => {
   try {
     const { role } = req.params;
     
-    if (!['enduser', 'customer', 'admin'].includes(role)) {
+    if (!['user', 'admin'].includes(role)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid role'
@@ -289,8 +280,8 @@ const getUsersByRole = async (req, res) => {
 // Routes
 router.get('/', protect, authorize('admin'), getUsers);
 router.get('/role/:role', protect, authorize('admin'), getUsersByRole);
-router.get('/:id', protect, getUserById);
 router.put('/profile', protect, updateProfile);
+router.get('/:id', protect, getUserById);
 router.put('/:id/role', protect, authorize('admin'), updateUserRole);
 router.put('/:id/status', protect, authorize('admin'), updateUserStatus);
 router.delete('/:id', protect, authorize('admin'), deleteUser);

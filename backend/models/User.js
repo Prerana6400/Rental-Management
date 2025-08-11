@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['enduser', 'customer', 'admin'],
-    default: 'enduser'
+    enum: ['user', 'admin'],
+    default: 'user'
   },
   phone: {
     type: String,
@@ -99,14 +99,9 @@ userSchema.methods.isAdmin = function() {
   return this.role === 'admin';
 };
 
-// Static method to check if user is enduser
-userSchema.methods.isEndUser = function() {
-  return this.role === 'enduser';
-};
-
-// Static method to check if user is customer
-userSchema.methods.isCustomer = function() {
-  return this.role === 'customer';
+// Static method to check if user is regular user
+userSchema.methods.isUser = function() {
+  return this.role === 'user';
 };
 
 module.exports = mongoose.model('User', userSchema);

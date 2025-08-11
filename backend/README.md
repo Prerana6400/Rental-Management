@@ -58,20 +58,7 @@ MONGODB_URI=mongodb://127.0.0.1:27017/flexirent
 
 Make sure MongoDB is running on your system.
 
-### 4. Seed Database
-
-```bash
-npm run seed
-```
-
-This creates sample users:
-- **Admin**: `admin@flexirent.com` / `admin123`
-- **EndUser**: `enduser@flexirent.com` / `password123`
-- **Customer**: `customer@flexirent.com` / `password123`
-- **Manager**: `manager@flexirent.com` / `manager123`
-- **Renter**: `renter@flexirent.com` / `renter123`
-
-### 5. Start Server
+### 4. Start Server
 
 ```bash
 # Development mode (with auto-reload)
@@ -83,7 +70,12 @@ npm start
 
 The server will start on `http://localhost:8080`
 
-### 6. Test API
+Admin bootstrap: On first run, the server ensures an admin exists using env vars (or defaults):
+- Email: `ADMIN_EMAIL` (default: `admin@flexirent.com`)
+- Password: `ADMIN_PASSWORD` (default: `admin123`)
+- Name: `ADMIN_NAME` (default: `Admin User`)
+
+### 5. Test API
 
 ```bash
 npm test

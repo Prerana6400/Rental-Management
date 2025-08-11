@@ -1,15 +1,12 @@
 const express = require('express');
 const User = require('../models/User');
 const { generateToken, protect } = require('../middleware/auth');
-
 const router = express.Router();
 
-// @desc    Register new user
-// @route   POST /api/auth/signup
-// @access  Public
+
 const signup = async (req, res) => {
   try {
-    const { name, email, password, role = 'enduser', phone, address } = req.body;
+    const { name, email, password, role = 'user', phone, address } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -84,14 +81,11 @@ const signup = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+//
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -99,7 +93,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Find user and include password for comparison
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     
     if (!user) {
@@ -109,7 +102,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if user is active
+  
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
@@ -159,9 +152,6 @@ const login = async (req, res) => {
   }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -191,13 +181,9 @@ const getMe = async (req, res) => {
   }
 };
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
-// @access  Private
 const logout = async (req, res) => {
   try {
-    // In a real application, you might want to blacklist the token
-    // For now, we'll just return a success message
+   
     res.json({
       success: true,
       message: 'Logged out successfully'
@@ -211,9 +197,6 @@ const logout = async (req, res) => {
   }
 };
 
-// @desc    Refresh token
-// @route   POST /api/auth/refresh
-// @access  Private
 const refreshToken = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

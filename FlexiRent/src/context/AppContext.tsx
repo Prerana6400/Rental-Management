@@ -35,7 +35,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'customer' | 'admin';
+  role: 'user' | 'admin';
   createdAt: Date;
   lastLogin?: Date;
 }
@@ -239,9 +239,9 @@ const mockUsers: User[] = [
   },
   {
     id: '2',
-    name: 'John Customer',
+    name: 'John User',
     email: 'john@example.com',
-    role: 'customer',
+    role: 'user',
     createdAt: new Date('2024-01-15'),
     lastLogin: new Date(Date.now() - 86400000)
   },
@@ -249,7 +249,7 @@ const mockUsers: User[] = [
     id: '3',
     name: 'Sarah Smith',
     email: 'sarah@example.com',
-    role: 'customer',
+    role: 'user',
     createdAt: new Date('2024-02-01'),
     lastLogin: new Date(Date.now() - 172800000)
   },
@@ -257,7 +257,7 @@ const mockUsers: User[] = [
     id: '4',
     name: 'Mike Johnson',
     email: 'mike@example.com',
-    role: 'customer',
+    role: 'user',
     createdAt: new Date('2024-02-15'),
     lastLogin: new Date(Date.now() - 259200000)
   }
@@ -483,7 +483,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const activeRentals = rentals.filter(rental => 
       rental.status === 'upcoming' || rental.status === 'active'
     ).length;
-    const totalCustomers = users.filter(user => user.role === 'customer').length;
+    const totalCustomers = users.filter(user => user.role === 'user').length;
     const totalQuotations = quotations.length;
     
     // Calculate monthly revenue (last 30 days)

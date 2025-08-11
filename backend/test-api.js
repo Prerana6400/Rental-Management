@@ -5,9 +5,9 @@ let authToken = '';
 
 // Test configuration
 const testUsers = {
-  admin: { email: 'admin@flexirent.com', password: 'admin123' },
-  enduser: { email: 'enduser@flexirent.com', password: 'password123' },
-  customer: { email: 'customer@flexirent.com', password: 'password123' }
+  admin: { email: process.env.ADMIN_EMAIL || 'admin@flexirent.com', password: process.env.ADMIN_PASSWORD || 'admin123' },
+  user1: { email: 'user@flexirent.com', password: 'password123' },
+  user2: { email: 'sarah@flexirent.com', password: 'password123' }
 };
 
 // Helper function to make API calls
@@ -158,7 +158,7 @@ const runAllTests = async () => {
   // Test health check
   await testHealthCheck();
   
-  // Test signup
+  // Test signup (optional)
   await testSignup();
   
   // Test login for all user types

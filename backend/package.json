@@ -5,9 +5,10 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "seed": "node scripts/seedUsers.js",
     "test": "node test-api.js",
-    "test:api": "node test-api.js"
+    "test:api": "node test-api.js",
+    "seed": "node scripts/seedSampleData.js",
+    "print": "node scripts/printData.js"
   },
   "keywords": [],
   "author": "",

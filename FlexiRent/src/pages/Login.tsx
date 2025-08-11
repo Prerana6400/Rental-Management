@@ -1,27 +1,43 @@
 import React, { useState } from 'react';
-import { User, Lock, UserCheck } from 'lucide-react';
+import { User, Lock, UserCheck, AlertCircle } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import apiService from '../services/api';
 
 const Login: React.FC = () => {
   const { setUser, setCurrentPage } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (role: 'customer' | 'admin') => {
-    // Mock login - in real app this would validate credentials
-    const mockUser = {
-      id: '1',
-      name: role === 'admin' ? 'Admin User' : 'John Customer',
-      email: email || `${role}@flexirent.com`,
-      role
-    };
-    
-    setUser(mockUser);
-    setCurrentPage('marketplace');
+  const handleLogin = async (email: string, password: string) => {
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await apiService.login({ email, password });
+      
+      if (response.success) {
+        setUser(response.data.user);
+        setCurrentPage('marketplace');
+      } else {
+        setError(response.message || 'Login failed');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,11 +55,11 @@ const Login: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            <Tabs defaultValue="customer" className="space-y-6">
+            <Tabs defaultValue="user" className="space-y-6">
               <TabsList className="grid w-full grid-cols-2 glass">
-                <TabsTrigger value="customer" className="flex items-center space-x-2">
+                <TabsTrigger value="user" className="flex items-center space-x-2">
                   <User className="w-4 h-4" />
-                  <span>Customer</span>
+                  <span>User</span>
                 </TabsTrigger>
                 <TabsTrigger value="admin" className="flex items-center space-x-2">
                   <UserCheck className="w-4 h-4" />
@@ -51,7 +67,7 @@ const Login: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="customer" className="space-y-4">
+              <TabsContent value="user" className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Email</label>
@@ -59,7 +75,7 @@ const Login: React.FC = () => {
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         type="email"
-                        placeholder="customer@flexirent.com"
+                        placeholder="user@flexirent.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 glass border-glass-border"
@@ -82,10 +98,11 @@ const Login: React.FC = () => {
                   </div>
 
                   <Button 
-                    onClick={() => handleLogin('customer')}
+                    onClick={() => handleLogin(email, password)}
+                    disabled={isLoading}
                     className="w-full btn-premium text-primary-foreground"
                   >
-                    Login as Customer
+                    {isLoading ? 'Logging in...' : 'Login as User'}
                   </Button>
                 </div>
               </TabsContent>
@@ -121,19 +138,33 @@ const Login: React.FC = () => {
                   </div>
 
                   <Button 
-                    onClick={() => handleLogin('admin')}
+                    onClick={() => handleLogin(email, password)}
+                    disabled={isLoading}
                     className="w-full bg-gradient-accent text-accent-foreground hover:shadow-hover"
                   >
-                    Login as Admin
+                    {isLoading ? 'Logging in...' : 'Login as Admin'}
                   </Button>
                 </div>
               </TabsContent>
             </Tabs>
 
+            {error && (
+              <Alert className="mt-4 border-red-200 bg-red-50">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  {error}
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Demo App - Click any login button to continue
+                Use the test credentials below to login
               </p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p><strong>Admin:</strong> admin@flexirent.com / admin123</p>
+                <p><strong>User:</strong> user@flexirent.com / password123</p>
+              </div>
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <button
