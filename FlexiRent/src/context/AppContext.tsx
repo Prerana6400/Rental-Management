@@ -38,6 +38,19 @@ export interface User {
   role: 'customer' | 'admin';
 }
 
+// New rental types
+export interface Rental {
+  id: string;
+  items: CartItem[];
+  paymentMode: 'full' | 'deposit';
+  subtotal: number;
+  serviceFee: number;
+  tax: number;
+  total: number;
+  createdAt: Date;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+}
+
 interface AppContextType {
   // User & Auth
   user: User | null;
@@ -54,6 +67,10 @@ interface AppContextType {
   // Products
   products: Product[];
   
+  // Rentals
+  rentals: Rental[];
+  placeOrder: (paymentMode: 'full' | 'deposit') => Rental;
+
   // Navigation
   currentPage: string;
   setCurrentPage: (page: string) => void;
@@ -132,6 +149,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPage, setCurrentPage] = useState('login');
   const [products] = useState<Product[]>(mockProducts);
+  const [rentals, setRentals] = useState<Rental[]>([]);
 
   const addToCart = (item: CartItem) => {
     setCart(prev => [...prev, item]);
@@ -164,6 +182,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, 0);
   };
 
+  // Create a rental from current cart and persist it in context
+  const placeOrder = (paymentMode: 'full' | 'deposit'): Rental => {
+    const subtotal = getCartTotal();
+    const serviceFee = Math.round(subtotal * 0.05);
+    const tax = Math.round(subtotal * 0.08);
+    const total = Math.round(subtotal * 1.13);
+
+    const newRental: Rental = {
+      id: `FR-${Date.now().toString().slice(-6)}`,
+      items: cart,
+      paymentMode,
+      subtotal,
+      serviceFee,
+      tax,
+      total,
+      createdAt: new Date(),
+      status: 'upcoming',
+    };
+
+    setRentals(prev => [newRental, ...prev]);
+    clearCart();
+    return newRental;
+  };
+
   const value: AppContextType = {
     user,
     setUser,
@@ -174,6 +216,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     clearCart,
     getCartTotal,
     products,
+    rentals,
+    placeOrder,
     currentPage,
     setCurrentPage
   };

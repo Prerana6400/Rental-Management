@@ -8,7 +8,7 @@ import { Separator } from '../components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 
 const Checkout: React.FC = () => {
-  const { cart, getCartTotal, clearCart, setCurrentPage } = useAppContext();
+  const { cart, getCartTotal, clearCart, setCurrentPage, placeOrder } = useAppContext();
   const [paymentMode, setPaymentMode] = useState('full');
   const [customerDetails, setCustomerDetails] = useState({
     name: '',
@@ -29,7 +29,8 @@ const Checkout: React.FC = () => {
     e.preventDefault();
     // Mock order processing
     setTimeout(() => {
-      clearCart();
+      // create rental and navigate
+      placeOrder(paymentMode as 'full' | 'deposit');
       setCurrentPage('order-confirmation');
     }, 2000);
   };
