@@ -68,9 +68,44 @@ const getUserById = async (req, res) => {
 };
 
 
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
-    const { name, email, phone, address } = req.body;
+    const { name, email } = req.body;
     
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -82,8 +117,6 @@ const updateProfile = async (req, res) => {
 
     // Update fields
     if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (address) user.address = address;
 
     // Check email uniqueness if provided
     if (email && email !== user.email) {
@@ -112,8 +145,8 @@ const updateProfile = async (req, res) => {
           name: updatedUser.name,
           email: updatedUser.email,
           role: updatedUser.role,
-          phone: updatedUser.phone,
-          address: updatedUser.address,
+          isActive: updatedUser.isActive,
+          lastLogin: updatedUser.lastLogin,
           updatedAt: updatedUser.updatedAt
         }
       }
@@ -280,6 +313,7 @@ const getUsersByRole = async (req, res) => {
 // Routes
 router.get('/', protect, authorize('admin'), getUsers);
 router.get('/role/:role', protect, authorize('admin'), getUsersByRole);
+router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
 router.get('/:id', protect, getUserById);
 router.put('/:id/role', protect, authorize('admin'), updateUserRole);

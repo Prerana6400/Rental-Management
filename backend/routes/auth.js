@@ -6,13 +6,21 @@ const router = express.Router();
 
 const signup = async (req, res) => {
   try {
-    const { name, email, password, role = 'user', phone, address } = req.body;
+    const { name, email, password, role = 'user' } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: 'Name, email, and password are required'
+      });
+    }
+
+    // Validate role
+    if (role && !['user', 'admin'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Role must be either "user" or "admin"'
       });
     }
 
@@ -33,10 +41,6 @@ const signup = async (req, res) => {
       role
     };
 
-    // Add optional fields if provided
-    if (phone) userData.phone = phone;
-    if (address) userData.address = address;
-
     const user = await User.create(userData);
 
     // Generate token
@@ -55,8 +59,8 @@ const signup = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          phone: user.phone,
-          address: user.address,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
           createdAt: user.createdAt
         },
         token
@@ -135,8 +139,7 @@ const login = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          phone: user.phone,
-          address: user.address,
+          isActive: user.isActive,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt
         },
@@ -164,8 +167,7 @@ const getMe = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          phone: user.phone,
-          address: user.address,
+          isActive: user.isActive,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
